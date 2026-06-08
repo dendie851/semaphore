@@ -1,0 +1,112 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ticket War Waiting Room</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            background-color: #f0f2f5;
+            margin: 0;
+            color: #333;
+        }
+        .container {
+            background-color: #fff;
+            padding: 40px;
+            border-radius: 10px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+            text-align: center;
+            max-width: 500px;
+            width: 90%;
+        }
+        h1 {
+            color: #007bff;
+            margin-bottom: 20px;
+        }
+        p {
+            font-size: 1.1em;
+            margin-bottom: 10px;
+        }
+        .queue-info {
+            margin-top: 30px;
+            padding: 20px;
+            background-color: #e9f7ef;
+            border-radius: 8px;
+            border: 1px solid #d4edda;
+        }
+        .queue-info p {
+            margin: 5px 0;
+            font-size: 1.2em;
+            font-weight: bold;
+        }
+        .loading {
+            font-style: italic;
+            color: #666;
+        }
+        .error {
+            color: #dc3545;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Welcome to the Ticket War Waiting Room!</h1>
+        <p>Please wait while we secure your spot for the event.</p>
+        <div class="queue-info">
+            <p>Your User ID: <span id="userIdDisplay" class="loading">Loading...</span></p>
+            <p>Current Position: <span id="queuePosition" class="loading">Loading...</span></p>
+            <p>Estimated Wait Time: <span id="estimatedTime" class="loading">Loading...</span> seconds</p>
+            <p>Queue Length: <span id="queueLength" class="loading">Loading...</span></p>
+            <p>Max Concurrent Users: <span id="maxConcurrent" class="loading">Loading...</span></p>
+        </div>
+        <p id="message" style="margin-top: 20px; color: #28a745; font-weight: bold;"></p>
+    </div>
+
+    <script>
+        let userId = localStorage.getItem('ticketWarUserId');
+        if (!userId) {
+            userId = 'user_' + Math.random().toString(36).substring(2, 15);
+            localStorage.setItem('ticketWarUserId', userId);
+        }
+        document.getElementById('userIdDisplay').textContent = userId;
+
+        async function checkQueueStatus() {
+            try {
+                const response = await fetch(`/api/cek-antrean?userId=${userId}`);
+                const data = await response.json();
+
+                if (data.status === 'redirect') {
+                    document.getElementById('message').textContent = 'Slot secured! Redirecting to checkout...';
+                    window.location.href = data.redirectUrl;
+                } else if (data.status === 'queued') {
+                    document.getElementById('queuePosition').textContent = data.position;
+                    document.getElementById('estimatedTime').textContent = data.estimatedTime;
+                    document.getElementById('queueLength').textContent = data.queueLength;
+                    document.getElementById('maxConcurrent').textContent = data.maxConcurrent;
+                    document.getElementById('message').textContent = 'You are in the queue. Please wait.';
+                } else {
+                    document.getElementById('message').textContent = 'An unexpected status was received.';
+                    console.error('Unexpected status:', data);
+                }
+            } catch (error) {
+                document.getElementById('message').className = 'error';
+                document.getElementById('message').textContent = 'Error connecting to server. Retrying...';
+                console.error('Error fetching queue status:', error);
+            }
+        }
+
+        // Poll every 2 seconds
+        setInterval(checkQueueStatus, 2000);
+
+        // Initial check
+        checkQueueStatus();
+    </script>
+</body>
+</html>
