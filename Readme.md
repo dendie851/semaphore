@@ -1,11 +1,11 @@
-# Unlocking the Secrets of Ticket War Architecture: Building a High-Concurrency Queue System with Semaphores
+# Unlocking the Secrets of Ticket War Architecture
 
 Have you ever wondered how major ticketing platforms handle millions of fans clicking "Buy Now" at the exact same millisecond without crashing? The secret lies in a smart queuing architecture. This project demonstrates how to build an efficient, crash-proof waiting room and checkout flow using Node.js, Express, and a semaphore pattern.
 
----
+
 
 ## Table of Contents
-- [Unlocking the Secrets of Ticket War Architecture: Building a High-Concurrency Queue System with Semaphores](#unlocking-the-secrets-of-ticket-war-architecture-building-a-high-concurrency-queue-system-with-semaphores)
+- [Unlocking the Secrets of Ticket War Architecture](#unlocking-the-secrets-of-ticket-war-architecture)
   - [Table of Contents](#table-of-contents)
   - [Introduction: Semaphore \& The Ticket War Case Study](#introduction-semaphore--the-ticket-war-case-study)
   - [System Architecture](#system-architecture)
@@ -17,7 +17,7 @@ Have you ever wondered how major ticketing platforms handle millions of fans cli
   - [How to Run the Application](#how-to-run-the-application)
   - [Demo Video](#demo-video)
 
----
+
 
 ## Introduction: Semaphore & The Ticket War Case Study
 
@@ -32,7 +32,7 @@ To solve this, we use the **Semaphore Pattern**. A Semaphore limits the number o
 - Once an active user finishes their payment or times out, the next user from the queue is moved to the checkout slot.
 - A **Mutex** is used in the backend to make sure states are updated safely without race conditions.
 
----
+
 
 ## System Architecture
 
@@ -60,7 +60,7 @@ Here is the detailed flow diagram showing API requests and token validation:
 - **Step 3: Access Validation**: The checkout page checks if the token is active. If valid, the user gets 300 seconds (5 minutes) to complete the transaction.
 - **Step 4: Payment Completion (`/api/bayar`)**: When the user clicks "Complete Payment", the server processes it, decrements the ticket count in `database.txt`, removes the token from the active list, and triggers `processQueue()` to let the next waiting user in.
 
----
+
 
 ## Evidence & Interface Walkthrough
 
@@ -86,7 +86,7 @@ Once a slot opens up, the user is redirected to the secure checkout page:
 - The "Complete Payment" button triggers the transaction.
 - Double-clicking is prevented on both the frontend and backend to avoid duplicate payments.
 
----
+
 
 ## How to Run the Application
 
@@ -113,7 +113,7 @@ Follow these simple steps to run this project on your local machine:
    http://localhost:3000
    ```
 
----
+
 
 ## Demo Video
 
